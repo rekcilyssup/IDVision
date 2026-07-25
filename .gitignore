@@ -1,0 +1,28 @@
+# Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Generated dataset images & JSON (generated dynamically via python scripts)
+data/clean/*.png
+data/clean/*.json
+data/degraded/*.png
+data/degraded/*.json
+!data/clean/.gitkeep
+!data/degraded/.gitkeep
+
+# Model checkpoints
+results/qwen2_vl_lora_checkpoint/
+checkpoint-*/
+
+# OS & IDE
+.DS_Store
+.vscode/
+.idea/
