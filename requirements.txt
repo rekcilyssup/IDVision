@@ -12,4 +12,5 @@ matplotlib>=3.7.0
 seaborn>=0.12.0
 scikit-learn
 Levenshtein
+flask>=3.0.0
 tqdm

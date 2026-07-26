@@ -25,6 +25,12 @@ This repository explores two key questions:
 id-doc-vlm/
 ├── README.md                                 # Research report & project documentation
 ├── requirements.txt                          # Python dependencies
+├── app.py                                    # Interactive Flask Web Dashboard Application
+├── templates/
+│   └── index.html                            # Dashboard UI HTML Layout
+├── static/
+│   ├── style.css                             # Dashboard Custom Styling
+│   └── app.js                                # Interactive Dashboard Controller
 ├── scripts/
 │   ├── generate_synthetic_data.py            # PIL + Faker multi-layout card generator
 │   ├── degrade_images.py                     # Synthetic corruption engine (blur, jpeg, tilt, glare)
@@ -154,6 +160,10 @@ python scripts/eval_harness.py --dry_run --output_csv results/baseline_results.c
 
 # 4. Generate Comparative Analysis Chart
 python scripts/analyze_results.py --baseline_csv results/baseline_results.csv --output_chart results/comparison_chart.png
+
+# 5. Launch Interactive Web Dashboard
+python app.py
+# Open http://localhost:5000 in your browser
 ```
 
 ---
