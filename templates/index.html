@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDVision Dashboard | Document VLM Evaluation</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <span class="logo-icon">👁️</span>
+                <h1>IDVision Dashboard</h1>
+                <span class="badge">VLM Robustness Engine</span>
+            </div>
+            <div class="stats-bar" id="statsBar">
+                <div class="stat-item">
+                    <span class="stat-label">Clean Documents</span>
+                    <span class="stat-value" id="cleanCount">0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Degraded Documents</span>
+                    <span class="stat-value" id="degradedCount">0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Eval Pipeline</span>
+                    <span class="stat-value status-badge" id="evalStatus">Not Evaluated</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-grid">
+            
+            <!-- SECTION 1: DOCUMENT GENERATOR -->
+            <section class="card-panel grid-span-2">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-icon">💳</span>
+                        <h2>Interactive Card Generator</h2>
+                    </div>
+                    <span class="panel-desc">Render synthetic documents with layout and theme selections</span>
+                </div>
+
+                <div class="generator-workspace">
+                    <!-- Config Controls -->
+                    <div class="config-controls">
+                        <form id="generatorForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="cardName">Full Name</label>
+                                    <input type="text" id="cardName" placeholder="e.g. JOHN DOE" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cardId">ID/License Number</label>
+                                    <input type="text" id="cardId" placeholder="e.g. DL-AB12345CD" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="cardDob">Date of Birth</label>
+                                    <input type="date" id="cardDob">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cardAddress">Address</label>
+                                    <input type="text" id="cardAddress" placeholder="123 MAIN ST, CITY, ST ZIP" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="cardIssue">Issue Date</label>
+                                    <input type="date" id="cardIssue">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cardExpiry">Expiry Date</label>
+                                    <input type="date" id="cardExpiry">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="cardLayout">Layout Variant</label>
+                                    <select id="cardLayout">
+                                        <option value="0">Variant A (Header Top, Photo Left)</option>
+                                        <option value="1">Variant B (Header Top, Photo Right)</option>
+                                        <option value="2">Variant C (Vertical Accent Sidebar)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cardTheme">Color Theme</label>
+                                    <select id="cardTheme">
+                                        <option value="0">Navy Deep Blue</option>
+                                        <option value="1">Slate Teal & Orange</option>
+                                        <option value="2">Charcoal & Green</option>
+                                        <option value="3">Burgundy & Violet</option>
+                                        <option value="4">Forest Green & Amber</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button type="button" class="btn btn-secondary" id="btnRandomize">Randomize Fields</button>
+                                <button type="button" class="btn btn-primary" id="btnGenerate">Generate Card</button>
+                                <button type="button" class="btn btn-success" id="btnSaveToClean">Save to Clean Set</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Generation Output Viewer -->
+                    <div class="output-viewer">
+                        <div class="viewer-tabs">
+                            <button class="tab-btn active" data-target="cardImageContainer">Document Card</button>
+                            <button class="tab-btn" data-target="cardJsonContainer">Ground Truth Schema</button>
+                        </div>
+                        <div class="viewer-content">
+                            <div class="tab-panel active" id="cardImageContainer">
+                                <div class="placeholder-box" id="cardImagePlaceholder">
+                                    <span>Click "Generate" to render card image</span>
+                                </div>
+                                <img id="renderedCardImg" src="" alt="Rendered ID Card" class="hidden">
+                            </div>
+                            <div class="tab-panel" id="cardJsonContainer">
+                                <pre><code id="renderedCardJson" class="language-json">{}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: DEGRADATION PLAYGROUND -->
+            <section class="card-panel grid-span-2">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-icon">🌫️</span>
+                        <h2>Degradation Playground</h2>
+                    </div>
+                    <span class="panel-desc">Simulate document acquisition corruptions interactively</span>
+                </div>
+
+                <div class="degradation-workspace">
+                    <!-- Sliders & Controls -->
+                    <div class="degradation-controls">
+                        <div class="filter-type-selector">
+                            <label class="radio-btn active">
+                                <input type="radio" name="degType" value="blur" checked>
+                                <span class="radio-label">Gaussian Blur</span>
+                            </label>
+                            <label class="radio-btn">
+                                <input type="radio" name="degType" value="jpeg">
+                                <span class="radio-label">JPEG Artifacts</span>
+                            </label>
+                            <label class="radio-btn">
+                                <input type="radio" name="degType" value="rotation">
+                                <span class="radio-label">Perspective Tilt</span>
+                            </label>
+                            <label class="radio-btn">
+                                <input type="radio" name="degType" value="glare">
+                                <span class="radio-label">Flash Glare</span>
+                            </label>
+                            <label class="radio-btn">
+                                <input type="radio" name="degType" value="combined">
+                                <span class="radio-label">Combined Noise</span>
+                            </label>
+                        </div>
+
+                        <!-- Dynamic Sliders -->
+                        <div class="parameter-sliders">
+                            <!-- Blur Slider -->
+                            <div class="slider-group" id="sliderGroupBlur">
+                                <div class="slider-header">
+                                    <span>Blur Radius (σ)</span>
+                                    <span class="slider-value" id="blurVal">3.0</span>
+                                </div>
+                                <input type="range" id="blurRadius" min="0.5" max="10.0" step="0.5" value="3.0">
+                            </div>
+
+                            <!-- JPEG Slider -->
+                            <div class="slider-group hidden" id="sliderGroupJpeg">
+                                <div class="slider-header">
+                                    <span>JPEG Quality Factor (Q)</span>
+                                    <span class="slider-value" id="jpegVal">20</span>
+                                </div>
+                                <input type="range" id="jpegQuality" min="5" max="95" step="5" value="20">
+                            </div>
+
+                            <!-- Tilt Slider -->
+                            <div class="slider-group hidden" id="sliderGroupRotation">
+                                <div class="slider-header">
+                                    <span>Rotation Angle (θ)</span>
+                                    <span class="slider-value" id="rotationVal">10.0°</span>
+                                </div>
+                                <input type="range" id="rotationAngle" min="-25.0" max="25.0" step="1.0" value="10.0">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-warning" id="btnApplyDegradation" style="width: 100%; margin-top: 15px;">Simulate Corruption</button>
+                    </div>
+
+                    <!-- Split Image Viewer -->
+                    <div class="split-viewer">
+                        <div class="image-box">
+                            <span class="box-label label-clean">Clean Source</span>
+                            <div class="image-wrapper">
+                                <img id="playgroundSourceImg" src="" alt="Clean Reference">
+                                <div class="box-placeholder" id="playgroundSourcePlaceholder">
+                                    <span>No active card image. Generate a card first.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="image-box">
+                            <span class="box-label label-degraded">Corrupted Output</span>
+                            <div class="image-wrapper">
+                                <img id="playgroundDegradedImg" src="" alt="Corrupted Result" class="hidden">
+                                <div class="box-placeholder" id="playgroundDegradedPlaceholder">
+                                    <span>Click "Simulate" to see result</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: EVALUATION & RESULTS -->
+            <section class="card-panel grid-span-4">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-icon">📉</span>
+                        <h2>Benchmark Evaluation & Analysis</h2>
+                    </div>
+                    <span class="panel-desc">Evaluate zero-shot model performance and plot training gains</span>
+                </div>
+
+                <div class="evaluation-workspace">
+                    <div class="eval-trigger-sidebar">
+                        <p class="explanation">
+                            Trigger the evaluation harness across generated clean and degraded files.
+                            This will simulate VLM predictions using mock predictions on your CPU and analyze exact-match similarities.
+                        </p>
+                        <button class="btn btn-primary btn-large" id="btnRunEval">Run Pipeline Evaluation</button>
+                        
+                        <div class="console-box">
+                            <div class="console-header">
+                                <span>Output logs</span>
+                                <span class="console-status" id="consoleStatus">Idle</span>
+                            </div>
+                            <pre class="console-output" id="consoleLog">No evaluation runs have been triggered yet.</pre>
+                        </div>
+                    </div>
+
+                    <div class="eval-results-content">
+                        <div class="results-visuals">
+                            <h3>Performance Comparison Chart</h3>
+                            <div class="chart-container">
+                                <img id="metricsChart" src="" alt="Comparative Metrics Chart" class="hidden">
+                                <div class="chart-placeholder" id="metricsChartPlaceholder">
+                                    <span>Charts will show here after evaluation runs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Script Controller -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
